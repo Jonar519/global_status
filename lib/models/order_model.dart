@@ -52,75 +52,35 @@ class OrderModel {
       total: total ?? this.total,
     );
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'customerName': customerName,
-      'items': items.map((item) => item.toJson()).toList(),
-      'createdAt': createdAt.toIso8601String(),
-      'startedAt': startedAt?.toIso8601String(),
-      'completedAt': completedAt?.toIso8601String(),
-      'status': status.index,
-      'total': total,
-    };
-  }
-
-  factory OrderModel.fromJson(Map<String, dynamic> json) {
-    return OrderModel(
-      id: json['id'],
-      customerName: json['customerName'],
-      items: (json['items'] as List)
-          .map((item) => OrderItem.fromJson(item))
-          .toList(),
-      createdAt: DateTime.parse(json['createdAt']),
-      startedAt:
-          json['startedAt'] != null ? DateTime.parse(json['startedAt']) : null,
-      completedAt: json['completedAt'] != null
-          ? DateTime.parse(json['completedAt'])
-          : null,
-      status: OrderStatus.values[json['status']],
-      total: json['total'].toDouble(),
-    );
-  }
 }
 
 class OrderItem {
   final String name;
   final int quantity;
   final double price;
+  final String? productId; // Opcional, para referencia
 
   OrderItem({
     required this.name,
     required this.quantity,
     required this.price,
+    this.productId,
   });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'quantity': quantity,
-      'price': price,
-    };
-  }
-
-  factory OrderItem.fromJson(Map<String, dynamic> json) {
-    return OrderItem(
-      name: json['name'],
-      quantity: json['quantity'],
-      price: json['price'].toDouble(),
-    );
-  }
 }
 
+// Modelo actualizado para nuevos pedidos
 class NewOrderItem {
+  String productId;
   String name;
   int quantity;
-  double price;
+  int unitPrice; // Precio en COP (entero)
 
   NewOrderItem({
+    required this.productId,
     required this.name,
     required this.quantity,
-    required this.price,
+    required this.unitPrice,
   });
+
+  int get subtotal => quantity * unitPrice;
 }

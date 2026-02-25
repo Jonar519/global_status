@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:get/get.dart';
 import '../../models/order_model.dart';
+import '../../controllers/order_controller.dart';
+import '../../constants/product_catalog.dart';
 
 class OrderCard extends StatelessWidget {
   final OrderModel order;
@@ -15,6 +18,8 @@ class OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('HH:mm');
+    // Obtener controlador para usar sus métodos
+    final OrderController controller = Get.find<OrderController>();
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -41,11 +46,11 @@ class OrderCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    _buildStatusChip(order.status),
+                    _buildStatusChip(order.status, controller),
                   ],
                 ),
                 Text(
-                  '\$${order.total.toStringAsFixed(2)}',
+                  ProductCatalog.formatPrice(order.total.toInt()),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -71,7 +76,7 @@ class OrderCard extends StatelessWidget {
 
             const SizedBox(height: 4),
 
-            // Tiempo
+            // Tiempo - UI en español
             Row(
               children: [
                 const Icon(Icons.access_time, size: 16, color: Colors.grey),
@@ -111,16 +116,25 @@ class OrderCard extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            // Items del pedido
+            // Items del pedido - Ahora con formato de moneda colombiana
             ...order.items.map((item) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('${item.quantity}x ${item.name}'),
+                      Expanded(
+                        child: Text(
+                          '${item.quantity}x ${item.name}',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
                       Text(
-                        '\$${(item.price * item.quantity).toStringAsFixed(2)}',
-                        style: const TextStyle(fontWeight: FontWeight.w500),
+                        ProductCatalog.formatPrice(
+                            (item.price * item.quantity).toInt()),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
@@ -128,10 +142,10 @@ class OrderCard extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // Botones de acción según estado
+            // Botones de acción según estado - Textos en español
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: _buildActionButtons(),
+              children: _buildActionButtons(controller),
             ),
           ],
         ),
@@ -139,32 +153,9 @@ class OrderCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusChip(OrderStatus status) {
-    Color color;
-    String label;
-
-    switch (status) {
-      case OrderStatus.pending:
-        color = Colors.orange;
-        label = 'Pendiente';
-        break;
-      case OrderStatus.preparing:
-        color = Colors.blue;
-        label = 'Preparando';
-        break;
-      case OrderStatus.ready:
-        color = Colors.green;
-        label = 'Listo';
-        break;
-      case OrderStatus.delivered:
-        color = Colors.grey;
-        label = 'Entregado';
-        break;
-      case OrderStatus.cancelled:
-        color = Colors.red;
-        label = 'Cancelado';
-        break;
-    }
+  Widget _buildStatusChip(OrderStatus status, OrderController controller) {
+    final color = controller.getStatusColor(status);
+    final label = controller.getStatusNameForUI(status);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -190,18 +181,18 @@ class OrderCard extends StatelessWidget {
     return Colors.red;
   }
 
-  List<Widget> _buildActionButtons() {
+  List<Widget> _buildActionButtons(OrderController controller) {
     switch (order.status) {
       case OrderStatus.pending:
         return [
           _buildActionButton(
-            label: 'Cancelar',
+            label: '❌ Cancelar',
             color: Colors.red,
             onPressed: () => onStatusChanged(OrderStatus.cancelled),
           ),
           const SizedBox(width: 8),
           _buildActionButton(
-            label: 'Iniciar',
+            label: '▶️ Iniciar',
             color: Colors.blue,
             onPressed: () => onStatusChanged(OrderStatus.preparing),
           ),
@@ -209,7 +200,7 @@ class OrderCard extends StatelessWidget {
       case OrderStatus.preparing:
         return [
           _buildActionButton(
-            label: 'Listo',
+            label: '✅ Listo',
             color: Colors.green,
             onPressed: () => onStatusChanged(OrderStatus.ready),
           ),
@@ -217,7 +208,7 @@ class OrderCard extends StatelessWidget {
       case OrderStatus.ready:
         return [
           _buildActionButton(
-            label: 'Entregar',
+            label: '🛒 Entregar',
             color: Colors.green,
             onPressed: () => onStatusChanged(OrderStatus.delivered),
           ),
@@ -241,8 +232,15 @@ class OrderCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        elevation: 2,
       ),
-      child: Text(label),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
     );
   }
 }

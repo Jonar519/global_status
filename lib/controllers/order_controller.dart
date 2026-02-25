@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/order_model.dart';
+import '../constants/product_catalog.dart'; // Agregar este import
 
 class OrderController extends GetxController {
   // Estado reactivo
@@ -45,7 +46,6 @@ class OrderController extends GetxController {
     super.onInit();
     loadMockOrders();
 
-    // Worker para actualizar tiempos cada segundo
     ever(orders, (_) {
       update();
     });
@@ -54,56 +54,55 @@ class OrderController extends GetxController {
   void loadMockOrders() {
     isLoading.value = true;
 
-    // Simular carga de datos
     Future.delayed(const Duration(seconds: 1), () {
       orders.value = [
         OrderModel(
           id: 'ORD-001',
           customerName: 'Juan Pérez',
           items: [
-            OrderItem(name: 'Café Americano', quantity: 2, price: 3.5),
-            OrderItem(name: 'Croissant', quantity: 1, price: 2.0),
+            OrderItem(name: 'Café Tinto', quantity: 2, price: 2500),
+            OrderItem(name: 'Pan de Bono', quantity: 1, price: 1800),
           ],
           createdAt: DateTime.now().subtract(const Duration(minutes: 5)),
           status: OrderStatus.pending,
-          total: 9.0,
+          total: 6800,
         ),
         OrderModel(
           id: 'ORD-002',
           customerName: 'María García',
           items: [
-            OrderItem(name: 'Capuchino', quantity: 1, price: 4.0),
-            OrderItem(name: 'Sandwich', quantity: 1, price: 5.5),
+            OrderItem(name: 'Capuchino', quantity: 1, price: 4500),
+            OrderItem(name: 'Almojábana', quantity: 2, price: 1800),
           ],
           createdAt: DateTime.now().subtract(const Duration(minutes: 10)),
           startedAt: DateTime.now().subtract(const Duration(minutes: 8)),
           status: OrderStatus.preparing,
-          total: 9.5,
+          total: 8100,
         ),
         OrderModel(
           id: 'ORD-003',
           customerName: 'Carlos López',
           items: [
-            OrderItem(name: 'Té Chai', quantity: 1, price: 3.0),
-            OrderItem(name: 'Muffin', quantity: 2, price: 2.5),
+            OrderItem(name: 'Café Frappé', quantity: 1, price: 5800),
+            OrderItem(name: 'Brownie', quantity: 1, price: 3800),
           ],
           createdAt: DateTime.now().subtract(const Duration(minutes: 15)),
           startedAt: DateTime.now().subtract(const Duration(minutes: 12)),
           status: OrderStatus.ready,
-          total: 8.0,
+          total: 9600,
         ),
         OrderModel(
           id: 'ORD-004',
           customerName: 'Ana Martínez',
           items: [
-            OrderItem(name: 'Latte', quantity: 1, price: 4.5),
-            OrderItem(name: 'Galleta', quantity: 3, price: 1.5),
+            OrderItem(name: 'Limonada de Coco', quantity: 2, price: 5500),
+            OrderItem(name: 'Empanada', quantity: 3, price: 2200),
           ],
           createdAt: DateTime.now().subtract(const Duration(minutes: 20)),
           startedAt: DateTime.now().subtract(const Duration(minutes: 18)),
           completedAt: DateTime.now().subtract(const Duration(minutes: 5)),
           status: OrderStatus.delivered,
-          total: 9.0,
+          total: 17600,
         ),
       ];
 
@@ -130,8 +129,8 @@ class OrderController extends GetxController {
       orders[index] = updatedOrder;
 
       Get.snackbar(
-        'Estado Actualizado',
-        'Pedido ${order.id} ahora está ${_getStatusName(newStatus)}',
+        '✅ Estado Actualizado',
+        'Pedido ${order.id} ahora está ${getStatusNameForUI(newStatus)}',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green,
         colorText: Colors.white,
@@ -145,8 +144,8 @@ class OrderController extends GetxController {
   void addOrder(OrderModel newOrder) {
     orders.add(newOrder);
     Get.snackbar(
-      '✅ Nuevo Pedido Creado',
-      'Pedido ${newOrder.id} de ${newOrder.customerName} agregado exitosamente',
+      '✅ Nuevo Pedido',
+      'Pedido ${newOrder.id} de ${newOrder.customerName} agregado correctamente',
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.green,
       colorText: Colors.white,
@@ -157,6 +156,10 @@ class OrderController extends GetxController {
     );
   }
 
+  void removeOrder(String orderId) {
+    orders.removeWhere((order) => order.id == orderId);
+  }
+
   void setFilter(OrderStatus status) {
     filterStatus.value = status;
   }
@@ -165,7 +168,8 @@ class OrderController extends GetxController {
     searchQuery.value = query;
   }
 
-  String _getStatusName(OrderStatus status) {
+  // Método para obtener nombre en español
+  String getStatusNameForUI(OrderStatus status) {
     switch (status) {
       case OrderStatus.pending:
         return 'Pendiente';
@@ -177,6 +181,22 @@ class OrderController extends GetxController {
         return 'Entregado';
       case OrderStatus.cancelled:
         return 'Cancelado';
+    }
+  }
+
+  // Método para obtener color según estado
+  Color getStatusColor(OrderStatus status) {
+    switch (status) {
+      case OrderStatus.pending:
+        return Colors.orange;
+      case OrderStatus.preparing:
+        return Colors.blue;
+      case OrderStatus.ready:
+        return Colors.green;
+      case OrderStatus.delivered:
+        return Colors.grey;
+      case OrderStatus.cancelled:
+        return Colors.red;
     }
   }
 }
