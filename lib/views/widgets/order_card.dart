@@ -116,7 +116,7 @@ class OrderCard extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            // Items del pedido - Ahora con formato de moneda colombiana
+            // Items del pedido
             ...order.items.map((item) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
@@ -142,7 +142,7 @@ class OrderCard extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // Botones de acción según estado - Textos en español
+            // Botones de acción según estado - SIN ICONOS
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: _buildActionButtons(controller),
@@ -186,13 +186,13 @@ class OrderCard extends StatelessWidget {
       case OrderStatus.pending:
         return [
           _buildActionButton(
-            label: '❌ Cancelar',
+            label: 'Cancelar', // Sin icono
             color: Colors.red,
             onPressed: () => onStatusChanged(OrderStatus.cancelled),
           ),
           const SizedBox(width: 8),
           _buildActionButton(
-            label: '▶️ Iniciar',
+            label: 'Iniciar', // Sin icono
             color: Colors.blue,
             onPressed: () => onStatusChanged(OrderStatus.preparing),
           ),
@@ -200,7 +200,7 @@ class OrderCard extends StatelessWidget {
       case OrderStatus.preparing:
         return [
           _buildActionButton(
-            label: '✅ Listo',
+            label: 'Listo', // Sin icono
             color: Colors.green,
             onPressed: () => onStatusChanged(OrderStatus.ready),
           ),
@@ -208,7 +208,7 @@ class OrderCard extends StatelessWidget {
       case OrderStatus.ready:
         return [
           _buildActionButton(
-            label: '🛒 Entregar',
+            label: 'Entregar', // Sin icono
             color: Colors.green,
             onPressed: () => onStatusChanged(OrderStatus.delivered),
           ),

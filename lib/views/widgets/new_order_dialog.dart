@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../models/order_model.dart';
 import '../../constants/product_catalog.dart';
-import '../../controllers/order_controller.dart'; // 👈 IMPORTANTE: Agregar este import
+import '../../controllers/order_controller.dart';
 import 'product_selector.dart';
 
 class NewOrderDialog extends StatefulWidget {
@@ -115,8 +115,15 @@ class _NewOrderDialogState extends State<NewOrderDialog> {
     Get.back(); // Cerrar el diálogo
 
     // Cambiar automáticamente al filtro de pendientes
-    final OrderController controller = Get.find<OrderController>();
-    controller.setFilter(OrderStatus.pending);
+    try {
+      final OrderController controller = Get.find<OrderController>();
+      // Forzar la actualización del filtro
+      Future.delayed(const Duration(milliseconds: 100), () {
+        controller.setFilter(OrderStatus.pending);
+      });
+    } catch (e) {
+      print('Error al obtener controller: $e');
+    }
   }
 
   @override
