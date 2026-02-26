@@ -28,32 +28,36 @@ class _NewOrderDialogState extends State<NewOrderDialog> {
   }
 
   void _showProductSelector() {
-    Get.dialog(
-      ProductSelector(
-        onProductSelected: (product, quantity) {
-          setState(() {
-            _items.add(NewOrderItem(
-              productId: product['id'],
-              name: product['name'],
-              quantity: quantity,
-              unitPrice: product['price'],
-            ));
-          });
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ProductSelector(
+          onProductSelected: (product, quantity) {
+            setState(() {
+              _items.add(NewOrderItem(
+                productId: product['id'],
+                name: product['name'],
+                quantity: quantity,
+                unitPrice: product['price'],
+              ));
+            });
 
-          Get.back(); // Cerrar el selector de productos
+            // Cerrar el selector de productos
+            Navigator.of(context).pop();
 
-          Get.snackbar(
-            'Producto Agregado',
-            '${quantity}x ${product['name']} - ${ProductCatalog.formatPrice(product['price'] * quantity)}',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-            duration: const Duration(seconds: 2),
-            margin: const EdgeInsets.all(10),
-            borderRadius: 10,
-          );
-        },
-      ),
+            Get.snackbar(
+              'Producto Agregado',
+              '${quantity}x ${product['name']} - ${ProductCatalog.formatPrice(product['price'] * quantity)}',
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.green,
+              colorText: Colors.white,
+              duration: const Duration(seconds: 2),
+              margin: const EdgeInsets.all(10),
+              borderRadius: 10,
+            );
+          },
+        );
+      },
     );
   }
 
@@ -112,12 +116,12 @@ class _NewOrderDialogState extends State<NewOrderDialog> {
     );
 
     widget.onOrderCreated(newOrder);
-    Get.back(); // Cerrar el diálogo
+    Navigator.of(context).pop(); // Cerrar el diálogo principal
 
     // Cambiar automáticamente al filtro de pendientes
     try {
       final OrderController controller = Get.find<OrderController>();
-      // Forzar la actualización del filtro
+      // Pequeño retraso para asegurar que el diálogo se cerró
       Future.delayed(const Duration(milliseconds: 100), () {
         controller.setFilter(OrderStatus.pending);
       });
@@ -155,7 +159,9 @@ class _NewOrderDialogState extends State<NewOrderDialog> {
                 ),
                 const Spacer(),
                 IconButton(
-                  onPressed: () => Get.back(),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Cerrar el diálogo
+                  },
                   icon: const Icon(Icons.close),
                 ),
               ],
@@ -304,7 +310,9 @@ class _NewOrderDialogState extends State<NewOrderDialog> {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => Get.back(),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Cerrar el diálogo
+                    },
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       side: const BorderSide(color: Colors.grey),

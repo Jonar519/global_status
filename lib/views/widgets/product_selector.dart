@@ -43,7 +43,9 @@ class _ProductSelectorState extends State<ProductSelector> {
                 ),
                 const Spacer(),
                 IconButton(
-                  onPressed: () => Get.back(),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Cerrar este diálogo
+                  },
                   icon: const Icon(Icons.close),
                 ),
               ],
@@ -161,24 +163,11 @@ class _ProductSelectorState extends State<ProductSelector> {
 
   // Widget para la imagen del producto
   Widget _buildProductImage(String productName) {
-    // Aquí puedes agregar lógica para mostrar diferentes imágenes según el producto
-    // Por ahora mostramos un icono de café genérico
     return const Icon(
       Icons.local_cafe,
       color: Colors.brown,
       size: 30,
     );
-  }
-
-  // Método para obtener iniciales del producto
-  String _getProductInitials(String productName) {
-    if (productName.isEmpty) return 'C';
-
-    List<String> words = productName.split(' ');
-    if (words.length > 1) {
-      return '${words[0][0]}${words[1][0]}'.toUpperCase();
-    }
-    return productName.substring(0, 1).toUpperCase();
   }
 
   void _showQuantitySelector(Map<String, dynamic> product) {
@@ -324,7 +313,10 @@ class _ProductSelectorState extends State<ProductSelector> {
                       children: [
                         Expanded(
                           child: OutlinedButton(
-                            onPressed: () => Navigator.of(context).pop(),
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pop(); // Cerrar selector de cantidad
+                            },
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
@@ -336,7 +328,8 @@ class _ProductSelectorState extends State<ProductSelector> {
                           child: ElevatedButton(
                             onPressed: () {
                               widget.onProductSelected(product, tempQuantity);
-                              Navigator.of(context).pop();
+                              Navigator.of(context)
+                                  .pop(); // Cerrar selector de cantidad
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green,
